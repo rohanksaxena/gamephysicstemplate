@@ -241,16 +241,13 @@ void MassSpringSystemSimulator::notifyCaseChanged(int testCase)
 }
 
 void MassSpringSystemSimulator::clamp(int point, float min, float max) {
-	int collision = 0;
 	//clam Y axis
 	if (masspoints[point].position.y < min) {
-		collision++;
 		masspoints[point].position.y = min;
 		masspoints[point].velocity *= -1;
 	}
 	else {
 		if (masspoints[point].position.y > max) {
-			collision++;
 			masspoints[point].position.y = max;
 			masspoints[point].velocity *= -1;
 		}
@@ -258,49 +255,29 @@ void MassSpringSystemSimulator::clamp(int point, float min, float max) {
 	//clamp X axis
 	if (masspoints[point].position.x < min) {
 		masspoints[point].position.x = min;
-		if (collision == 0) {
-			masspoints[point].velocity *= -1;
-		}
-		collision++;
+		masspoints[point].velocity *= -1;
 	}
 	else {
 		if (
 			masspoints[point].position.x > max) {
 			masspoints[point].position.x = max;
-			if (collision == 0) {
-				masspoints[point].velocity *= -1;
-			}
-			collision++;
+			masspoints[point].velocity *= -1;
 		}
 	}
 	//clamp Z axis
 	if (
 		masspoints[point].position.z < min) {
 		masspoints[point].position.z = min;
-		if (collision == 0) {
-			masspoints[point].velocity *= -1;
-		}
-		collision++;
+		masspoints[point].velocity *= -1;
 	}
 	else {
 		if (
 			masspoints[point].position.z > max) {
 			masspoints[point].position.z = max;
-			if (collision == 0 ) {
-				masspoints[point].velocity *= -1;
-			}
-			collision++;
+			masspoints[point].velocity *= -1;
 		}
 	}
-
-	if (collision == 3) {
-		std::uniform_real_distribution<float> randPos(-0.5f, 0.5f);
-		std::uniform_real_distribution<float> randVel(-50, 50);
-
-		masspoints[point].position = Vec3(randPos(eng), randPos(eng), randPos(eng));
-		masspoints[point].velocity = Vec3(randVel(eng), randVel(eng), randVel(eng));
-	}
-	
+		
 }
 void MassSpringSystemSimulator::simulateEulerStep(int steps, int spring, float time) {
 	Vec3 diff;
