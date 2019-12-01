@@ -2,9 +2,14 @@
 #define RIGIDBODYSYSTEMSIMULATOR_h
 #include "Simulator.h"
 //add your header for your rigid body system, for e.g.,
-//#include "rigidBodySystem.h" 
-
+#include "RigidBodySystem.h" 
+#include "collisionDetect.h"
 #define TESTCASEUSEDTORUNTEST 2
+
+#define RED 0
+#define YELLOW 1
+#define GREEN 2
+#define WHITE 3
 
 class RigidBodySystemSimulator:public Simulator{
 public:
@@ -32,12 +37,23 @@ public:
 	void setOrientationOf(int i,Quat orientation);
 	void setVelocityOf(int i, Vec3 velocity);
 
+	void integrateRigidBody(int i, float step);
+	void handleCollision(int objA, int objB);
+	void handleWallCollision(int objA, int objB);
+	void resetPositions();
+
 private:
 	// Attributes
 	// add your RigidBodySystem data members, for e.g.,
 	// RigidBodySystem * m_pRigidBodySystem; 
+	RigidBodySystem m_pRigidBodySystem[14];
+	CollisionInfo collInfo;
 	Vec3 m_externalForce;
-
+	int count;
+	int objectColor;
+	float damping;
+	int iterator;
+	
 	// UI Attributes
 	Point2D m_mouse;
 	Point2D m_trackmouse;
