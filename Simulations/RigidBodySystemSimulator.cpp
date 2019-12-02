@@ -24,11 +24,11 @@ RigidBodySystemSimulator::RigidBodySystemSimulator()
 	addRigidBody(Vec3(0.15f, 0.05f, 0), Vec3(0.2f, 0.2f, 0.1f), 8);
 
 	//Demo4
-	addRigidBody(Vec3(-0.25f, -0.4f, 0), Vec3(0.1f, 0.1f, 0.1f), 1);
-	addRigidBody(Vec3(0.25f, -0.4f, 0), Vec3(0.1f, 0.1f, 0.1f), 1);
+	addRigidBody(Vec3(-0.25f, -0.4f, 0), Vec3(0.1f, 0.1f, 0.1f), 10);
+	addRigidBody(Vec3(0.25f, -0.4f, 0), Vec3(0.1f, 0.1f, 0.1f), 10);
 
-	addRigidBody(Vec3(0.1f, -0.2f, 0), Vec3(0.1f, 0.1f, 0.1f), 1);
-	addRigidBody(Vec3(-0.15f, -0.2f, 0), Vec3(0.1f, 0.1f, 0.1f), 1);
+	addRigidBody(Vec3(0.1f, -0.2f, 0), Vec3(0.1f, 0.1f, 0.1f), 10);
+	addRigidBody(Vec3(-0.15f, -0.2f, 0), Vec3(0.1f, 0.1f, 0.1f), 10);
 
 	//Floor and walls
 	addRigidBody(Vec3(0, -0.55f, 0), Vec3(1, 0.025f, 1), 1000000);
@@ -76,17 +76,17 @@ void RigidBodySystemSimulator::drawFrame(ID3D11DeviceContext * pd3dImmediateCont
 	switch (m_iTestCase)
 	{
 	case 0:
-		DUC->setUpLighting(Vec3(1, 1, 1), Vec3(0, 0, 0), 1, Vec3(0, 0, 0));
+		DUC->setUpLighting(Vec3(), 0.4*Vec3(1, 1, 1), 100, 0.6*Vec3(0.97, 0.86, 1));
 		m_pRigidBodySystem[0].calculateObjToWorldMatrix();
 		DUC->drawRigidBody(m_pRigidBodySystem[0].objToWorldMat);
 		break;
 	case 1:
-		DUC->setUpLighting(Vec3(1, 1, 1), Vec3(0, 0, 0), 1, Vec3(0, 0, 0));
+		DUC->setUpLighting(Vec3(), 0.4*Vec3(1, 1, 1), 100, 0.6*Vec3(0.97, 0.86, 1));
 		m_pRigidBodySystem[1].calculateObjToWorldMatrix();
 		DUC->drawRigidBody(m_pRigidBodySystem[1].objToWorldMat);
 		break;
 	case 2:
-		DUC->setUpLighting(Vec3(1, 1, 1), Vec3(0, 0, 0), 1, Vec3(0, 0, 0));
+		DUC->setUpLighting(Vec3(), 0.4*Vec3(1, 1, 1), 100, 0.6*Vec3(0.97, 0.86, 1));
 		m_pRigidBodySystem[2].calculateObjToWorldMatrix();
 		DUC->drawRigidBody(m_pRigidBodySystem[2].objToWorldMat);
 
@@ -95,19 +95,19 @@ void RigidBodySystemSimulator::drawFrame(ID3D11DeviceContext * pd3dImmediateCont
 		break;
 	case 3:
 		m_pRigidBodySystem[4].calculateObjToWorldMatrix();
-		DUC->setUpLighting(Vec3(1, 0, 0), Vec3(0, 0, 0), 1, Vec3(0, 0, 0));
+		DUC->setUpLighting(Vec3(1, 0, 0), Vec3(0, 0, 0), 0.5f, Vec3(0, 0, 0));
 		DUC->drawRigidBody(m_pRigidBodySystem[4].objToWorldMat);
 
 		m_pRigidBodySystem[5].calculateObjToWorldMatrix();
-		DUC->setUpLighting(Vec3(1, 1, 0), Vec3(0, 0, 0), 1, Vec3(0, 0, 0));
+		DUC->setUpLighting(Vec3(1, 1, 0), Vec3(0, 0, 0), 0.5f, Vec3(0, 0, 0));
 		DUC->drawRigidBody(m_pRigidBodySystem[5].objToWorldMat);
 
 		m_pRigidBodySystem[6].calculateObjToWorldMatrix();
-		DUC->setUpLighting(Vec3(0, 1, 0), Vec3(0, 0, 0), 1, Vec3(0, 0, 0));
+		DUC->setUpLighting(Vec3(0, 1, 0), Vec3(0, 0, 0), 0.5f, Vec3(0, 0, 0));
 		DUC->drawRigidBody(m_pRigidBodySystem[6].objToWorldMat);
 
 		m_pRigidBodySystem[7].calculateObjToWorldMatrix();
-		DUC->setUpLighting(Vec3(1, 1, 1), Vec3(0, 0, 0), 1, Vec3(0, 0, 0));
+		DUC->setUpLighting(Vec3(1, 1, 1), Vec3(0, 0, 0), 0.5f, Vec3(0, 0, 0));
 		DUC->drawRigidBody(m_pRigidBodySystem[7].objToWorldMat);
 		break;
 	default:
@@ -274,6 +274,7 @@ void RigidBodySystemSimulator::handleCollision(int objA, int objB) {
 	Vec3 velRel = velA - velB;
 	float normalVel = dot(collInfo.normalWorld, velRel);
 	float c = 1;
+
 	if (normalVel < 0) {
 		float impulse;
 
@@ -283,12 +284,10 @@ void RigidBodySystemSimulator::handleCollision(int objA, int objB) {
 				dot(((cross(m_pRigidBodySystem[objA].intertiaTensorInverse * cross(posA, collInfo.normalWorld), posA)) +
 				(cross(m_pRigidBodySystem[objB].intertiaTensorInverse * cross(posB, collInfo.normalWorld), posB))), collInfo.normalWorld));
 		//ObjA
-		m_pRigidBodySystem[objA].comPosition += collInfo.depth * collInfo.normalWorld;
-		m_pRigidBodySystem[objA].comVelocity += impulse * collInfo.normalWorld / m_pRigidBodySystem[objA].mass;
+		m_pRigidBodySystem[objA].comVelocity += collInfo.normalWorld * impulse / m_pRigidBodySystem[objA].mass;
 		m_pRigidBodySystem[objA].angularMomentum += (cross(posA, impulse * collInfo.normalWorld));
 
 		//ObjB
-		m_pRigidBodySystem[objB].comPosition -= collInfo.depth * collInfo.normalWorld;
 		m_pRigidBodySystem[objB].comVelocity -= impulse * collInfo.normalWorld / m_pRigidBodySystem[objB].mass;
 		m_pRigidBodySystem[objB].angularMomentum -= (cross(posB, impulse * collInfo.normalWorld));
 	}
