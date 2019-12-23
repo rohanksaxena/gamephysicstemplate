@@ -75,7 +75,7 @@ void DiffusionSimulator::initUI(DrawingUtilitiesClass * DUC)
 	// to be implemented
 	TwAddVarRW(DUC->g_pTweakBar, "n", TW_TYPE_INT32, &n, "min=1");
 	TwAddVarRW(DUC->g_pTweakBar, "m", TW_TYPE_INT32, &m, "min=1");
-	TwAddVarRW(DUC->g_pTweakBar, "Alpha", TW_TYPE_FLOAT, &alpha, "min=0.1f");
+	TwAddVarRW(DUC->g_pTweakBar, "Alpha", TW_TYPE_FLOAT, &alpha, "min=0.1f, step=0.1f");
 }
 
 void DiffusionSimulator::notifyCaseChanged(int testCase)
