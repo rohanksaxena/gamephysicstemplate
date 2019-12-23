@@ -12,10 +12,12 @@ public:
 	Grid(int n, int m);
 	float** grid;
 	void clearGrid();
-	float n;
-	float m;
+	float getN();
+	float getM();
 private:
 	// Attributes
+	float n;
+	float m;
 };
 
 class DiffusionSimulator:public Simulator{

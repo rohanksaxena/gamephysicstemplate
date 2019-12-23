@@ -36,6 +36,13 @@ void Grid::clearGrid() {
 	delete[] grid;
 }
 
+float Grid::getM() {
+	return this->m;
+}
+
+float Grid::getN() {
+	return this->n;
+}
 
 DiffusionSimulator::DiffusionSimulator()
 {
@@ -98,7 +105,7 @@ void DiffusionSimulator::notifyCaseChanged(int testCase)
 }
 
 Grid* DiffusionSimulator::diffuseTemperatureExplicit(float dt) {//add your own parameters
-	if (n != T->n || m != T->m) {
+	if (n != T->getN() || m != T->getM()) {
 		T->clearGrid();
 		T = new Grid(n, m);
 	}
@@ -134,22 +141,21 @@ void setupB(Grid* T, std::vector<Real>& b, double factor, float dt, float dx, in
 		}
 	}
 	std::vector<Real> *c = new std::vector<Real>(b.size());
-	for (int i = 0; i < T->n; i++) {
-		for (int j = 0; j < T->m; j++) {
-			(*c).at(i * T->m + j) = T->grid[i][j];
+	for (int i = 0; i < T->getN(); i++) {
+		for (int j = 0; j < T->getM(); j++) {
+			(*c).at(i * T->getM() + j) = T->grid[i][j];
 		}
 	}
 	multiply(*B, *c, b);
-	
 }
 
 void fillT(std::vector<Real> x, Grid* T) {//add your own parameters
 	// to be implemented
 	//fill T with solved vector x
 	//make sure that the temperature in boundary cells stays zero
-	for (int i = 0; i < T->n; i++) {
-		for (int j = 0; j < T->m; j++) {
-			T->grid[i][j] = x.at(i * T->m + j);
+	for (int i = 0; i < T->getN(); i++) {
+		for (int j = 0; j < T->getM(); j++) {
+			T->grid[i][j] = x.at(i * T->getM() + j);
 		}
 	}
 }
@@ -179,7 +185,7 @@ void setupA(SparseMatrix<Real>& A, double factor, float dt, float dx, int n, int
 
 void DiffusionSimulator::diffuseTemperatureImplicit(float dt) {//add your own parameters
 
-	if (n != T->n || m != T->m) {
+	if (n != T->getN() || m != T->getM()) {
 		T->clearGrid();
 		T = new Grid(n, m);
 	}
@@ -232,16 +238,15 @@ void DiffusionSimulator::drawObjects()
 	// to be implemented
 	//visualization
 	//if (m_iTestCase == 0) {
-	float stepX = 1 / T->n;
-	float stepY = 1 / T->m;
+	float stepX = 1 / T->getN();
+	float stepY = 1 / T->getM();
 
-	for (int j = 0; j < T->m; j++) {
-		for (int i = 0; i < T->n; i++) {
+	for (int j = 0; j < T->getM(); j++) {
+		for (int i = 0; i < T->getN(); i++) {
 			setLighting(T->grid[i][j]);
 			DUC->drawSphere(Vec3(i * stepX - 0.5f, j * stepY - 0.5f, 0), Vec3(0.05f, 0.05f, 0.05f));
 		}
 	}
-	//} 
 }
 
 void DiffusionSimulator::setLighting(float value) {
@@ -251,7 +256,6 @@ void DiffusionSimulator::setLighting(float value) {
 	else {
 		DUC->setUpLighting(Vec3(0, 0, 0), Vec3(0, 0, 0), 1, Vec3(-value, 0, 0));
 	}
-
 }
 
 void DiffusionSimulator::drawFrame(ID3D11DeviceContext* pd3dImmediateContext)
