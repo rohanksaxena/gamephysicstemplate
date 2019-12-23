@@ -7,15 +7,16 @@
 //impement your own grid class for saving grid data
 class Grid {
 public:
-	// Construtors
 	Grid();
-
-
+	// Construtors
+	Grid(int n, int m);
+	float** grid;
+	void clearGrid();
+	float n;
+	float m;
 private:
 	// Attributes
 };
-
-
 
 class DiffusionSimulator:public Simulator{
 public:
@@ -34,8 +35,9 @@ public:
 	void onMouse(int x, int y);
 	// Specific Functions
 	void drawObjects();
-	Grid* diffuseTemperatureExplicit();
-	void diffuseTemperatureImplicit();
+	Grid* diffuseTemperatureExplicit(float dt);
+	void diffuseTemperatureImplicit(float dt);
+	void setLighting(float value);
 
 private:
 	// Attributes
@@ -46,6 +48,11 @@ private:
 	Point2D m_trackmouse;
 	Point2D m_oldtrackmouse;
 	Grid *T; //save results of every time step
+	float alpha;
+	float dx;
+	float dy;
+	int n;
+	int m;
 };
 
 #endif
