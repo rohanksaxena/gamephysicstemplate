@@ -24,7 +24,8 @@ using namespace GamePhysics;
 //#define MASS_SPRING_SYSTEM
 //#define RIGID_BODY_SYSTEM
 //#define SPH_SYSTEM
-#define DIFFUSION_SYSTEM
+//#define DIFFUSION_SYSTEM
+#define COUPLED_SIMULATION
 
 #ifdef TEMPLATE_DEMO
 #include "TemplateSimulator.h"
@@ -37,6 +38,9 @@ using namespace GamePhysics;
 #endif
 #ifdef SPH_SYSTEM
 //#include "SPHSystemSimulator.h"
+#endif
+#ifdef COUPLED_SIMULATION
+#include "CoupledSimulation.h"
 #endif
 
 #ifdef DIFFUSION_SYSTEM
@@ -377,6 +381,9 @@ int main(int argc, char* argv[])
 #endif
 #ifdef DIFFUSION_SYSTEM
 	g_pSimulator= new DiffusionSimulator();
+#endif
+#ifdef COUPLED_SIMULATION
+	g_pSimulator = new CoupledSimulation();
 #endif
 	g_pSimulator->reset();
 
