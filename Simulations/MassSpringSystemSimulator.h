@@ -12,7 +12,7 @@
 class MassSpringSystemSimulator:public Simulator{
 public:
 	// Construtors
-	MassSpringSystemSimulator();
+	MassSpringSystemSimulator(int masspointsCount, int springsCount);
 	
 	// UI Functions
 	const char * getTestCasesStr();
@@ -52,26 +52,31 @@ public:
 		m_iIntegrator = integrator;
 	}
 
+	void addSimulationMasspoints();
+	struct Masspoint {
+		Vec3 position;
+		Vec3 velocity;
+		bool isFixed;
+	};
+	Masspoint* masspoints;
+	int masspointsCounter;
+	int springsCounter;
 private:
 	// Data Attributes
 	float m_fMass;
 	float m_fStiffness;
 	float m_fDamping;
 	int m_iIntegrator;
-	struct Masspoint {
-		Vec3 position;
-		Vec3 velocity;
-		bool isFixed;
-	};
-	Masspoint masspoints[30];
-	int masspointsCounter;
+	
+	
+	
 	struct Spring {
 		int first;
 		int second;
 		float initL;
 	};
-	Spring springs[53];
-	int springsCounter;
+	Spring* springs;
+	
 	Vec3 gravity;
 	int oldIntegrator;
 	std::mt19937 eng;

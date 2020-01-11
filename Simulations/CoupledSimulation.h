@@ -2,6 +2,7 @@
 #ifndef COUPLEDSIMULATION_h
 #define COUPLEDSIMULATION_h
 #include "Simulator.h"
+#include "MassSpringSystemSimulator.h"
 
 class CoupledSimulation :public Simulator
 {
@@ -18,6 +19,9 @@ public:
 	void simulateTimestep(float timeStep);
 	void onClick(int x, int y);
 	void onMouse(int x, int y);
+	MassSpringSystemSimulator* springSim;
+	void drawTrampoline();
+	void drawLine(int point1, int point2);
 };
 #endif
 
