@@ -28,6 +28,7 @@ public:
 	Vec3 m_externalForce;
 	int mpl; // masspoints per line
 	float step;
+	float border;
 	void drawTrampoline();
 	void drawLine(int point1, int point2);
 	void integrateBall(float step);

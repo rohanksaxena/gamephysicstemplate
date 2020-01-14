@@ -6,18 +6,20 @@ CoupledSimulation::CoupledSimulation()
 {
 	mpl = 0;
 	step = 0.05f;
+	border = 0.375f;
 	springSim = new MassSpringSystemSimulator(5776, 17024);
 	drawTrampoline();
-	ball.init(Vec3(0,0,0), Vec3(0.1f, 0.1f, 0.1f), 100, SPHERE);
+	ball.init(Vec3(0, 0, 0), Vec3(0.1f, 0.1f, 0.1f), 100, SPHERE);
 	damping = 0;
 	m_externalForce = Vec3(0, -10, 0);
+	
 }
 
 void CoupledSimulation::drawTrampoline()
 {
-	for (float i = -0.375f; i < 0.375f; i += step){
+	for (float i = -border; i < border; i += step) {
 		mpl++;
-		for (float j = -0.375f; j < 0.375f; j += step) {
+		for (float j = -border; j < border; j += step) {
 			springSim->addMassPoint(Vec3(i, -0.5f, j), Vec3(0, 0, 0), true);
 		}
 	}
@@ -64,13 +66,13 @@ void CoupledSimulation::drawFrame(ID3D11DeviceContext * pd3dImmediateContext)
 	for (int i = 0; i < springSim->masspointsCounter; i++) {
 		DUC->drawSphere(springSim->masspoints[i].position, Vec3(0.005f, 0.005f, 0.005f));
 	}
-	
+
 	for (int i = 0; i < (springSim->masspointsCounter - mpl); i++) {
 		drawLine(i, i + 1);
 		drawLine(i, i + (mpl - 1));
 		drawLine(i, i + mpl);
 	}
-	
+
 	for (int i = (springSim->masspointsCounter - mpl); i < springSim->masspointsCounter - 1; i++) {
 		drawLine(i, i + 1);
 	}
@@ -94,9 +96,11 @@ void CoupledSimulation::externalForcesCalculations(float timeElapsed)
 
 void CoupledSimulation::simulateTimestep(float timeStep)
 {
-	integrateBall(timeStep);
-	if (CoupledCollision::checkCollision(ball, springSim)) {
-		cout << "Collided";
+
+	if (CoupledCollision::checkCollision(ball, springSim, border, step, mpl)) {
+	}
+	else {
+		integrateBall(timeStep);
 	}
 }
 
@@ -119,12 +123,6 @@ void CoupledSimulation::integrateBall(float step)
 
 	ball.forces = Vec3(0, 0, 0);
 	ball.torque = Vec3(0, 0, 0);
-
-	if (m_iTestCase == 0) {
-		cout << "Angular Velocity after one Euler step: " << ball.angularVelocity << "\n";
-		Vec3 pointVelocity = ball.comVelocity + cross(ball.angularVelocity, Vec3(-0.3f, -0.5f, -0.25f));
-		cout << "Linear Velocity at point (-0.3, -0.5, -0.25) after one Euler step: " << pointVelocity << "\n";
-	}
 }
 
 void CoupledSimulation::onClick(int x, int y)
