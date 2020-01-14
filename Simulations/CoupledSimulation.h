@@ -3,6 +3,7 @@
 #define COUPLEDSIMULATION_h
 #include "Simulator.h"
 #include "MassSpringSystemSimulator.h"
+#include "RigidBodySystem.h"
 
 class CoupledSimulation :public Simulator
 {
@@ -19,9 +20,17 @@ public:
 	void simulateTimestep(float timeStep);
 	void onClick(int x, int y);
 	void onMouse(int x, int y);
+
+
 	MassSpringSystemSimulator* springSim;
+	RigidBodySystem ball;
+	float damping;
+	Vec3 m_externalForce;
+	int mpl; // masspoints per line
+	float step;
 	void drawTrampoline();
 	void drawLine(int point1, int point2);
+	void integrateBall(float step);
 };
 #endif
 

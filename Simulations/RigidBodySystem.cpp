@@ -4,7 +4,7 @@ RigidBodySystem::RigidBodySystem()
 {
 }
 
-void RigidBodySystem::init(Vec3 position, Vec3 size, float mass)
+void RigidBodySystem::init(Vec3 position, Vec3 size, float mass, int type)
 {
 	this->torque = Vec3(0, 0, 0);
 	this->forces = Vec3(0, 0, 0);
@@ -18,14 +18,27 @@ void RigidBodySystem::init(Vec3 position, Vec3 size, float mass)
 	this->orientation = Quat(0, 0, 0, 1);
 	this->angularVelocity = Vec3(0, 0, 0);
 
+	this->type = type;
+
 	calculateObjToWorldMatrix();
 }
 
 void RigidBodySystem::precalculateIntertiaInverse()
 {
-	float xx = 12 / (mass * (pow(size.y, 2) + pow(size.z, 2)));
-	float yy = 12 / (mass * (pow(size.x, 2) + pow(size.z, 2)));
-	float zz = 12 / (mass * (pow(size.x, 2) + pow(size.y, 2)));
+	float xx = 0, yy = 0, zz = 0;
+	if (type == CUBE) {
+		xx = 12 / (mass * (pow(size.y, 2) + pow(size.z, 2)));
+		yy = 12 / (mass * (pow(size.x, 2) + pow(size.z, 2)));
+		zz = 12 / (mass * (pow(size.x, 2) + pow(size.y, 2)));
+	}
+	else {
+		if (type == SPHERE) {
+			xx = (2.0f / 5.0f) * this->mass * pow(this->size.x, 2);
+			yy = xx;
+			zz = xx;
+		}
+	}
+	
 	intertiaTensorInverse = Mat4(xx, 0, 0, 0,
 		0, yy, 0, 0,
 		0, 0, zz, 0,
