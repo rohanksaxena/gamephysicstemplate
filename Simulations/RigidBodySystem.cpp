@@ -10,6 +10,7 @@ void RigidBodySystem::init(Vec3 position, Vec3 size, float mass, int type)
 	this->forces = Vec3(0, 0, 0);
 	this->size = size;
 	this->mass = mass;
+	this->type = type;
 	precalculateIntertiaInverse();
 	comVelocity = Vec3(0, 0, 0);
 
@@ -18,7 +19,7 @@ void RigidBodySystem::init(Vec3 position, Vec3 size, float mass, int type)
 	this->orientation = Quat(0, 0, 0, 1);
 	this->angularVelocity = Vec3(0, 0, 0);
 
-	this->type = type;
+	
 
 	calculateObjToWorldMatrix();
 }
@@ -33,7 +34,7 @@ void RigidBodySystem::precalculateIntertiaInverse()
 	}
 	else {
 		if (type == SPHERE) {
-			xx = (2.0f / 5.0f) * this->mass * pow(this->size.x, 2);
+			xx = 5.0f/(2.0f * mass * pow(size.x, 2));
 			yy = xx;
 			zz = xx;
 		}

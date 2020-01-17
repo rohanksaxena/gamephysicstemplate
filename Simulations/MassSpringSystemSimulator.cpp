@@ -135,7 +135,7 @@ const char * MassSpringSystemSimulator::getTestCasesStr()
 void MassSpringSystemSimulator::initUI(DrawingUtilitiesClass * DUC)
 {
 	this->DUC = DUC;
-	
+
 	if (m_iTestCase == 3) {
 		TwType TW_TYPE_INTEGRATOR = TwDefineEnumFromString("Integrator", "Euler, Leapfrog, Midpoint");
 		TwAddVarRW(DUC->g_pTweakBar, "Integrator", TW_TYPE_INTEGRATOR, &m_iIntegrator, "");
@@ -210,7 +210,7 @@ void MassSpringSystemSimulator::notifyCaseChanged(int testCase)
 		simulateEulerStep(1, 0, 0.1f);
 		resetPositions();
 		simulateMidpointStep(1, 0, 0.1f);
-		
+
 		break;
 	case 1:
 		gravity = Vec3(0, 0, 0);
@@ -277,7 +277,7 @@ void MassSpringSystemSimulator::clamp(int point, float min, float max) {
 			masspoints[point].velocity *= -1;
 		}
 	}
-		
+
 }
 void MassSpringSystemSimulator::simulateEulerStep(int steps, int spring, float time) {
 	Vec3 diff;
@@ -307,7 +307,7 @@ void MassSpringSystemSimulator::simulateEulerStep(int steps, int spring, float t
 			forces = -springForce + m_externalForce - damping;
 			acceleration = (forces / m_fMass) + gravity;
 			masspoints[springs[spring].second].velocity += time * acceleration;
-			
+
 			if (m_iTestCase == 3) {
 				clamp(springs[spring].first, -0.5f, 0.5f);
 				clamp(springs[spring].second, -0.5f, 0.5f);
@@ -321,7 +321,7 @@ void MassSpringSystemSimulator::simulateEulerStep(int steps, int spring, float t
 				}
 			}
 		}
-		
+
 	}
 }
 
@@ -332,7 +332,6 @@ void MassSpringSystemSimulator::simulateMidpointStep(int steps, int spring, floa
 	Vec3 forces;
 	Vec3 oldAcceleration;
 
-	
 	for (int i = 0; i < steps; i++) {
 		diff = masspoints[springs[spring].first].position - masspoints[springs[spring].second].position;
 		if (diff.x != 0 || diff.y != 0 || diff.z != 0) {
@@ -390,31 +389,33 @@ void MassSpringSystemSimulator::simulateLeapfrogStep(int steps, int spring, floa
 	Vec3 damping;
 	Vec3 forces;
 	Vec3 acceleration;
-
-
 	for (int i = 0; i < steps; i++) {
 		diff = masspoints[springs[spring].first].position - masspoints[springs[spring].second].position;
 		if (diff.x != 0 || diff.y != 0 || diff.z != 0) {
-			springForce = (m_fStiffness * (-sqrtf(dot(diff, diff)) + springs[spring].initL) / sqrtf(dot(diff, diff))) * diff;
-			damping = m_fDamping * masspoints[springs[spring].first].velocity;
-			forces = springForce + m_externalForce - damping;
-			acceleration = (forces / m_fMass) + (gravity);
-			masspoints[springs[spring].first].velocity += time * 0.5f * acceleration;
-			masspoints[springs[spring].first].position += time * masspoints[springs[spring].first].velocity;
 
-			springForce = (m_fStiffness * (-sqrtf(dot(diff, diff)) + springs[spring].initL) / sqrtf(dot(diff, diff))) * (-diff);
-			damping = m_fDamping * masspoints[springs[spring].second].velocity;
-			forces = springForce + m_externalForce - damping;
-			acceleration = (forces / m_fMass) + (gravity);
-			masspoints[springs[spring].second].velocity += time * 0.5f * acceleration;
-			masspoints[springs[spring].second].position += time * masspoints[springs[spring].second].velocity;
+			if (!masspoints[springs[spring].first].isFixed) {
+				springForce = (m_fStiffness * (-sqrtf(dot(diff, diff)) + springs[spring].initL) / sqrtf(dot(diff, diff))) * diff;
+				damping = m_fDamping * masspoints[springs[spring].first].velocity;
+				forces = springForce + m_externalForce - damping;
+				acceleration = (forces / m_fMass) + (gravity);
+				masspoints[springs[spring].first].velocity += time * 0.5f * acceleration;
+				masspoints[springs[spring].first].position += time * masspoints[springs[spring].first].velocity;
+			}
+
+			if (!masspoints[springs[spring].second].isFixed) {
+				springForce = (m_fStiffness * (-sqrtf(dot(diff, diff)) + springs[spring].initL) / sqrtf(dot(diff, diff))) * (-diff);
+				damping = m_fDamping * masspoints[springs[spring].second].velocity;
+				forces = springForce + m_externalForce - damping;
+				acceleration = (forces / m_fMass) + (gravity);
+				masspoints[springs[spring].second].velocity += time * 0.5f * acceleration;
+				masspoints[springs[spring].second].position += time * masspoints[springs[spring].second].velocity;
+			}
 			if (m_iTestCase == 3) {
 				clamp(springs[spring].first, -0.5f, 0.5f);
 				clamp(springs[spring].second, -0.5f, 0.5f);
 			}
 		}
 	}
-
 }
 
 void MassSpringSystemSimulator::externalForcesCalculations(float timeElapsed)
@@ -435,7 +436,7 @@ void MassSpringSystemSimulator::externalForcesCalculations(float timeElapsed)
 			m_externalForce = inputWorld;
 		}
 	}
-	
+
 }
 
 void MassSpringSystemSimulator::simulateTimestep(float timeStep)
@@ -505,6 +506,7 @@ int MassSpringSystemSimulator::addMassPoint(Vec3 position, Vec3 Velocity, bool i
 	Masspoint masspoint;
 	masspoint.position = position;
 	masspoint.velocity = Velocity;
+	masspoint.isFixed = isFixed;
 	masspoints[masspointsCounter - 1] = masspoint;
 	return masspointsCounter - 1;
 }

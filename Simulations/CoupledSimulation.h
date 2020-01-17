@@ -32,6 +32,7 @@ public:
 	void drawTrampoline();
 	void drawLine(int point1, int point2);
 	void integrateBall(float step);
+	void handleCollision(int index);
 };
 #endif
 

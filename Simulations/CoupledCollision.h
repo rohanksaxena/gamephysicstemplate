@@ -9,7 +9,7 @@ class CoupledCollision
 public:
 	CoupledCollision();
 	~CoupledCollision();
-	static bool checkCollision(RigidBodySystem body, MassSpringSystemSimulator* masspointSystem, float border, float step, int mpl);
+	static int checkCollision(RigidBodySystem body, MassSpringSystemSimulator* masspointSystem, float border, float step, int mpl);
 private:
 	static int* searchArea(float dPosX, float dPosZ, float radius, int* areaSize, float border, float step, int mpl);
 };

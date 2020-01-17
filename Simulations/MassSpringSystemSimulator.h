@@ -61,21 +61,23 @@ public:
 	Masspoint* masspoints;
 	int masspointsCounter;
 	int springsCounter;
-private:
-	// Data Attributes
-	float m_fMass;
-	float m_fStiffness;
-	float m_fDamping;
-	int m_iIntegrator;
-	
-	
-	
+
 	struct Spring {
 		int first;
 		int second;
 		float initL;
 	};
 	Spring* springs;
+	float m_fMass;
+private:
+	// Data Attributes
+	
+	float m_fStiffness;
+	float m_fDamping;
+	int m_iIntegrator;
+	
+	
+	
 	
 	Vec3 gravity;
 	int oldIntegrator;
