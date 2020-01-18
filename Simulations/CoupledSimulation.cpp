@@ -7,15 +7,17 @@ CoupledSimulation::CoupledSimulation()
 	mpl = 0;
 	step = 0.05f;
 	border = 0.375f;
+	mpSize = 0.02f;
 	springSim = new MassSpringSystemSimulator(256, 705);
 	springSim->setMass(5);
-	springSim->setStiffness(50000);
+	springSim->setStiffness(500000);
+	springSim->setDampingFactor(10);
 
 	drawTrampoline();
-	ball.init(Vec3(0, 0, 0), Vec3(0.1f, 0.1f, 0.1f), 1, SPHERE);
+	ball.init(Vec3(0.375f, 0, 0), Vec3(0.1f, 0.1f, 0.1f), 1, SPHERE);
 	damping = 0;
 	m_externalForce = Vec3(0, -50, 0);
-
+	
 }
 
 void CoupledSimulation::drawTrampoline()
@@ -46,6 +48,11 @@ void CoupledSimulation::drawTrampoline()
 		springSim->addSpring(i, i + 1, step);
 	}
 	cout << springSim->masspointsCounter << " " << mpl << " " << springSim->springsCounter << "\n";
+
+	diffusionSim = new DiffusionSimulator();
+	diffusionSim->T = new Grid(mpl,mpl);
+	diffusionSim->n = mpl;
+	diffusionSim->m = mpl;
 }
 
 CoupledSimulation::~CoupledSimulation()
@@ -65,13 +72,23 @@ void CoupledSimulation::initUI(DrawingUtilitiesClass * DUC)
 
 void CoupledSimulation::reset()
 {
+	m_mouse.x = m_mouse.y = 0;
+	m_trackmouse.x = m_trackmouse.y = 0;
+	m_oldtrackmouse.x = m_oldtrackmouse.y = 0;
 }
 
 void CoupledSimulation::drawFrame(ID3D11DeviceContext * pd3dImmediateContext)
 {
-	DUC->setUpLighting(Vec3(0, 0, 0), Vec3(0, 0, 0), 1, Vec3(1, 1, 1));
+	
 	for (int i = 0; i < springSim->masspointsCounter; i++) {
-		DUC->drawSphere(springSim->masspoints[i].position, Vec3(0.005f, 0.005f, 0.005f));
+	float value  = diffusionSim->T->grid[i % mpl][i/mpl];
+			if (value > 0) {
+				DUC->setUpLighting(Vec3(0, 0, 0), Vec3(0, 0, 0), 1, Vec3(value, value, value));
+			}
+			else {
+				DUC->setUpLighting(Vec3(0, 0, 0), Vec3(0, 0, 0), 1, Vec3(-value, 0, 0));
+			}
+		DUC->drawSphere(springSim->masspoints[i].position, Vec3(mpSize, mpSize, mpSize));
 	}
 
 	for (int i = 0; i < (springSim->masspointsCounter - mpl); i++) {
@@ -86,7 +103,7 @@ void CoupledSimulation::drawFrame(ID3D11DeviceContext * pd3dImmediateContext)
 	for (int i = (springSim->masspointsCounter - mpl); i < springSim->masspointsCounter - 1; i++) {
 		drawLine(i, i + 1);
 	}
-
+	DUC->setUpLighting(Vec3(0, 0, 0), Vec3(0, 0, 0), 1, Vec3(1, 1, 1));
 	DUC->drawSphere(ball.comPosition, ball.size);
 
 }
@@ -103,11 +120,31 @@ void CoupledSimulation::notifyCaseChanged(int testCase)
 
 void CoupledSimulation::externalForcesCalculations(float timeElapsed)
 {
+	Point2D mouseDiff;
+	mouseDiff.x = m_trackmouse.x - m_oldtrackmouse.x;
+	mouseDiff.y = m_trackmouse.y - m_oldtrackmouse.y;
+
+	if (mouseDiff.x != 0 || mouseDiff.y != 0)
+	{
+		Mat4 worldViewInv = Mat4(DUC->g_camera.GetWorldMatrix() * DUC->g_camera.GetViewMatrix());
+		worldViewInv = worldViewInv.inverse();
+		Vec3 inputView = Vec3((float)mouseDiff.x, (float)-mouseDiff.y, 0);
+		Vec3 inputWorld = worldViewInv.transformVectorNormal(inputView);
+		Vec3 contact = worldViewInv.transformVector(Vec3(m_trackmouse.x, m_trackmouse.y, 0));
+
+		// find a proper scale!
+		float inputScale = 1;
+		inputWorld = inputWorld * inputScale;
+
+		ball.forces += inputWorld;
+		ball.torque += cross(Vec3(0, 0, 0), inputWorld);
+		
+	}
 }
 
 void CoupledSimulation::simulateTimestep(float timeStep)
 {
-	int collIndex = CoupledCollision::checkCollision(ball, springSim, border, step, mpl);
+	int collIndex = CoupledCollision::checkCollision(ball, springSim, border, step, mpl, diffusionSim);
 	if (collIndex != -1) {
 		handleCollision(collIndex);
 	}
@@ -117,6 +154,8 @@ void CoupledSimulation::simulateTimestep(float timeStep)
 	for (int i = 1; i < springSim->getNumberOfSprings(); i++) {
 		springSim->simulateLeapfrogStep(1, i, timeStep);
 	}
+
+	diffusionSim->diffuseTemperatureImplicit(timeStep * 100);
 }
 
 void CoupledSimulation::integrateBall(float step)
@@ -136,8 +175,8 @@ void CoupledSimulation::integrateBall(float step)
 	ball.intertiaTensorInverse = ball.orientation.getRotMat() * ball.intertiaTensorInverse * transposeRotation;
 	ball.angularVelocity = ball.intertiaTensorInverse * ball.angularMomentum;
 
-	//ball.forces = Vec3(0, 0, 0);
-	//ball.torque = Vec3(0, 0, 0);
+	ball.forces = Vec3(0, 0, 0);
+	ball.torque = Vec3(0, 0, 0);
 }
 
 void CoupledSimulation::handleCollision(int index)
@@ -150,7 +189,7 @@ void CoupledSimulation::handleCollision(int index)
 	float c = 1.5f;
 	if (normalVel < 0) {
 		//calculating the inertia tensor inverse for the masspoint 
-		float xx = 5.0f / (2.0f * springSim->m_fMass * pow(0.05f, 2));
+		float xx = 5.0f / (2.0f * springSim->m_fMass * pow(mpSize, 2));
 		Mat4 mpi = Mat4(xx, 0, 0, 0,
 			0, xx, 0, 0,
 			0, 0, xx, 0,
@@ -174,10 +213,16 @@ void CoupledSimulation::handleCollision(int index)
 
 void CoupledSimulation::onClick(int x, int y)
 {
+	m_trackmouse.x = x;
+	m_trackmouse.y = y;
 }
 
 void CoupledSimulation::onMouse(int x, int y)
 {
+	m_oldtrackmouse.x = x;
+	m_oldtrackmouse.y = y;
+	m_trackmouse.x = x;
+	m_trackmouse.y = y;
 }
 
 

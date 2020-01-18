@@ -69,11 +69,12 @@ public:
 	};
 	Spring* springs;
 	float m_fMass;
+	float m_fDamping;
 private:
 	// Data Attributes
 	
 	float m_fStiffness;
-	float m_fDamping;
+	
 	int m_iIntegrator;
 	
 	

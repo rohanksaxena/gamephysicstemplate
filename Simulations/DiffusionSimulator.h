@@ -40,7 +40,9 @@ public:
 	Grid* diffuseTemperatureExplicit(float dt);
 	void diffuseTemperatureImplicit(float dt);
 	void setLighting(float value);
-
+	int n;
+	int m;
+	Grid *T; //save results of every time step
 private:
 	// Attributes
 	Vec3  m_vfMovableObjectPos;
@@ -49,12 +51,11 @@ private:
 	Point2D m_mouse;
 	Point2D m_trackmouse;
 	Point2D m_oldtrackmouse;
-	Grid *T; //save results of every time step
+	
 	float alpha;
 	float dx;
 	float dy;
-	int n;
-	int m;
+	
 };
 
 #endif
