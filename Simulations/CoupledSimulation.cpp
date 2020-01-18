@@ -7,16 +7,20 @@ CoupledSimulation::CoupledSimulation()
 	mpl = 0;
 	step = 0.05f;
 	border = 0.375f;
+
+	ballSize = 0.1f;
 	mpSize = 0.02f;
 	springSim = new MassSpringSystemSimulator(256, 705);
 	springSim->setMass(5);
-	springSim->setStiffness(500000);
+	springStifness = 500000;
+	
 	springSim->setDampingFactor(10);
+	damping = 0;
 
 	drawTrampoline();
-	ball.init(Vec3(0.375f, 0, 0), Vec3(0.1f, 0.1f, 0.1f), 1, SPHERE);
-	damping = 0;
-	m_externalForce = Vec3(0, -50, 0);
+	ball.init(Vec3(0, 0, 0), Vec3(ballSize, ballSize, ballSize), 1, SPHERE);
+	
+	m_externalForce = Vec3(0, -200, 0);
 	
 }
 
@@ -67,6 +71,10 @@ const char * CoupledSimulation::getTestCasesStr()
 void CoupledSimulation::initUI(DrawingUtilitiesClass * DUC)
 {
 	this->DUC = DUC;
+	TwAddVarRW(DUC->g_pTweakBar, "Masspoints size", TW_TYPE_FLOAT, &mpSize, "min=0.005 step=0.001 max=0.05");
+	TwAddVarRW(DUC->g_pTweakBar, "Ball size", TW_TYPE_FLOAT, &ballSize, "min=0.05 step=0.001 max=0.1");
+	TwAddVarRW(DUC->g_pTweakBar, "Springs stiffness", TW_TYPE_FLOAT, &springStifness, "min=200000 step=10000 max=1000000");
+
 
 }
 
@@ -79,7 +87,8 @@ void CoupledSimulation::reset()
 
 void CoupledSimulation::drawFrame(ID3D11DeviceContext * pd3dImmediateContext)
 {
-	
+	springSim->setStiffness(springStifness);
+	ball.size = Vec3(ballSize,ballSize,ballSize);
 	for (int i = 0; i < springSim->masspointsCounter; i++) {
 	float value  = diffusionSim->T->grid[i % mpl][i/mpl];
 			if (value > 0) {

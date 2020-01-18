@@ -32,6 +32,8 @@ public:
 	float step;
 	float border;
 	float mpSize;
+	float ballSize;
+	float springStifness;
 	void drawTrampoline();
 	void drawLine(int point1, int point2);
 	void integrateBall(float step);
