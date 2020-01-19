@@ -142,7 +142,7 @@ void CoupledSimulation::externalForcesCalculations(float timeElapsed)
 		Vec3 contact = worldViewInv.transformVector(Vec3(m_trackmouse.x, m_trackmouse.y, 0));
 
 		// find a proper scale!
-		float inputScale = 1;
+		float inputScale = 1.5f;
 		inputWorld = inputWorld * inputScale;
 
 		ball.forces += inputWorld;
@@ -233,5 +233,3 @@ void CoupledSimulation::onMouse(int x, int y)
 	m_trackmouse.x = x;
 	m_trackmouse.y = y;
 }
-
-
