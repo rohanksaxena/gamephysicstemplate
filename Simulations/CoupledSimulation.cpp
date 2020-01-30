@@ -20,7 +20,7 @@ CoupledSimulation::CoupledSimulation()
 	drawTrampoline();
 	ball.init(Vec3(0, 0, 0), Vec3(ballSize, ballSize, ballSize), 1, SPHERE);
 	
-	m_externalForce = Vec3(0, -200, 0);
+	m_externalForce = Vec3(0, -100, 0);
 	
 }
 
@@ -83,6 +83,9 @@ void CoupledSimulation::reset()
 	m_mouse.x = m_mouse.y = 0;
 	m_trackmouse.x = m_trackmouse.y = 0;
 	m_oldtrackmouse.x = m_oldtrackmouse.y = 0;
+	ball.comPosition = Vec3(0,0,0);
+	ball.comVelocity =  Vec3(0, 0, 0);
+
 }
 
 void CoupledSimulation::drawFrame(ID3D11DeviceContext * pd3dImmediateContext)
@@ -125,6 +128,8 @@ void CoupledSimulation::drawLine(int point1, int point2) {
 
 void CoupledSimulation::notifyCaseChanged(int testCase)
 {
+	ball.comPosition = Vec3(0, 0, 0);
+	ball.comVelocity = Vec3(0, 0, 0);
 }
 
 void CoupledSimulation::externalForcesCalculations(float timeElapsed)
