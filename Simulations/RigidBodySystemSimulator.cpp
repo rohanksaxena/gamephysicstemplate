@@ -8,42 +8,42 @@ RigidBodySystemSimulator::RigidBodySystemSimulator()
 	iterator = 4;
 
 	//Demo 1
-	addRigidBody(Vec3(0, 0, 0), Vec3(1, 0.6f, 0.5f), 2);
+	addRigidBody(Vec3(0, 0, 0), Vec3(1, 0.6f, 0.5f), 2, CUBE);
 	setOrientationOf(0, Quat(0, 0, sqrt(2) / 2, sqrt(2) / 2));
 	applyForceOnBody(0, Vec3(0.3f, 0.5f, 0.25f), Vec3(1, 1, 0));
 
 	//Demo 2
-	addRigidBody(Vec3(-0.2f, -0.1f, 0.1f), Vec3(0.2, 0.6f, 0.5f), 2);
+	addRigidBody(Vec3(-0.2f, -0.1f, 0.1f), Vec3(0.2, 0.6f, 0.5f), 2, CUBE);
 	applyForceOnBody(1, Vec3(-0.1f, -0.4f, 0.35f), Vec3(1, 1, 0));
 
 	//Demo3
-	addRigidBody(Vec3(0.2f, 0.3f, 0), Vec3(0.1f, 0.1f, 0.1f), 4);
+	addRigidBody(Vec3(0.2f, 0.3f, 0), Vec3(0.1f, 0.1f, 0.1f), 4, CUBE);
 	setOrientationOf(2, Quat(0, sin(M_PI / 8), 0, cos(M_PI / 8)) * Quat(0, 0, sin(M_PI / 8), cos(M_PI / 8)));
 	setVelocityOf(2, Vec3(-0.1f, -0.1f, 0));
 
-	addRigidBody(Vec3(0.15f, 0.05f, 0), Vec3(0.2f, 0.2f, 0.1f), 8);
+	addRigidBody(Vec3(0.15f, 0.05f, 0), Vec3(0.2f, 0.2f, 0.1f), 8, CUBE);
 
 	//Demo4
-	addRigidBody(Vec3(-0.25f, -0.4f, 0), Vec3(0.1f, 0.1f, 0.1f), 1);
-	addRigidBody(Vec3(0.25f, -0.4f, 0), Vec3(0.1f, 0.1f, 0.1f), 1);
+	addRigidBody(Vec3(-0.25f, -0.4f, 0), Vec3(0.1f, 0.1f, 0.1f), 1, CUBE);
+	addRigidBody(Vec3(0.25f, -0.4f, 0), Vec3(0.1f, 0.1f, 0.1f), 1, CUBE);
 
-	addRigidBody(Vec3(0.1f, -0.2f, 0), Vec3(0.1f, 0.1f, 0.1f), 1);
-	addRigidBody(Vec3(-0.15f, -0.2f, 0), Vec3(0.1f, 0.1f, 0.1f), 1);
+	addRigidBody(Vec3(0.1f, -0.2f, 0), Vec3(0.1f, 0.1f, 0.1f), 1, CUBE);
+	addRigidBody(Vec3(-0.15f, -0.2f, 0), Vec3(0.1f, 0.1f, 0.1f), 1, CUBE);
 
 	//Floor and walls
-	addRigidBody(Vec3(0, -0.55f, 0), Vec3(1, 0.025f, 1), 1000000);
+	addRigidBody(Vec3(0, -0.55f, 0), Vec3(1, 0.025f, 1), 1000000, CUBE);
 	m_pRigidBodySystem[8].calculateObjToWorldMatrix();
-	addRigidBody(Vec3(0, 0.51f, 0), Vec3(1, 0.025f, 1), 1000000);
+	addRigidBody(Vec3(0, 0.51f, 0), Vec3(1, 0.025f, 1), 1000000, CUBE);
 	m_pRigidBodySystem[9].calculateObjToWorldMatrix();
 
-	addRigidBody(Vec3(-0.51f, 0, 0), Vec3(0.025f, 1, 1), 1000000);
+	addRigidBody(Vec3(-0.51f, 0, 0), Vec3(0.025f, 1, 1), 1000000, CUBE);
 	m_pRigidBodySystem[10].calculateObjToWorldMatrix();
-	addRigidBody(Vec3(0.51f, 0, 0), Vec3(0.025f, 1, 1), 1000000);
+	addRigidBody(Vec3(0.51f, 0, 0), Vec3(0.025f, 1, 1), 1000000, CUBE);
 	m_pRigidBodySystem[11].calculateObjToWorldMatrix();
 
-	addRigidBody(Vec3(0, 0, -0.51f), Vec3(1, 1, 0.025f), 1000000);
+	addRigidBody(Vec3(0, 0, -0.51f), Vec3(1, 1, 0.025f), 1000000, CUBE);
 	m_pRigidBodySystem[12].calculateObjToWorldMatrix();
-	addRigidBody(Vec3(0, 0, 0.51f), Vec3(1, 1, 0.025f), 1000000);
+	addRigidBody(Vec3(0, 0, 0.51f), Vec3(1, 1, 0.025f), 1000000, CUBE);
 	m_pRigidBodySystem[13].calculateObjToWorldMatrix();
 }
 
@@ -223,9 +223,9 @@ void RigidBodySystemSimulator::applyForceOnBody(int i, Vec3 loc, Vec3 force)
 	m_pRigidBodySystem[i].torque += cross(loc, force);
 }
 
-void RigidBodySystemSimulator::addRigidBody(Vec3 position, Vec3 size, int mass)
+void RigidBodySystemSimulator::addRigidBody(Vec3 position, Vec3 size, int mass, int type)
 {
-	m_pRigidBodySystem[count].init(position, size, mass);
+	m_pRigidBodySystem[count].init(position, size, mass, type);
 	count++;
 }
 
@@ -360,23 +360,23 @@ void RigidBodySystemSimulator::resetPositions() {
 	damping = 0;
 
 	//Reset Demo1
-	m_pRigidBodySystem[0].init(Vec3(0, 0, 0), m_pRigidBodySystem[0].size, m_pRigidBodySystem[0].mass);
+	m_pRigidBodySystem[0].init(Vec3(0, 0, 0), m_pRigidBodySystem[0].size, m_pRigidBodySystem[0].mass, CUBE);
 	setOrientationOf(0, Quat(0, 0, sqrt(2) / 2, sqrt(2) / 2));
 	applyForceOnBody(0, Vec3(0.3f, 0.5f, 0.25f), Vec3(1, 1, 0));
 
 	//Reset Demo2
-	m_pRigidBodySystem[1].init(Vec3(-0.2f, -0.1f, 0.1f), m_pRigidBodySystem[1].size, m_pRigidBodySystem[1].mass);
+	m_pRigidBodySystem[1].init(Vec3(-0.2f, -0.1f, 0.1f), m_pRigidBodySystem[1].size, m_pRigidBodySystem[1].mass, CUBE);
 
 	//Reset Demo3
-	m_pRigidBodySystem[2].init(Vec3(0.2f, 0.3f, 0), m_pRigidBodySystem[2].size, m_pRigidBodySystem[2].mass);
+	m_pRigidBodySystem[2].init(Vec3(0.2f, 0.3f, 0), m_pRigidBodySystem[2].size, m_pRigidBodySystem[2].mass, CUBE);
 	setOrientationOf(2, Quat(0, sin(M_PI / 8), 0, cos(M_PI / 8)) * Quat(0, 0, sin(M_PI / 8), cos(M_PI / 8)));
 	setVelocityOf(2, Vec3(-0.1f, -0.1f, 0));
 
-	m_pRigidBodySystem[3].init(Vec3(0.15f, 0.05f, 0), m_pRigidBodySystem[3].size, m_pRigidBodySystem[3].mass);
+	m_pRigidBodySystem[3].init(Vec3(0.15f, 0.05f, 0), m_pRigidBodySystem[3].size, m_pRigidBodySystem[3].mass, CUBE);
 
 	//Demo4
-	m_pRigidBodySystem[4].init(Vec3(-0.25f, -0.4f, 0), m_pRigidBodySystem[4].size, m_pRigidBodySystem[4].mass);
-	m_pRigidBodySystem[5].init(Vec3(0.25f, -0.4f, 0), m_pRigidBodySystem[5].size, m_pRigidBodySystem[5].mass);
-	m_pRigidBodySystem[6].init(Vec3(0.1f, -0.2f, 0), m_pRigidBodySystem[6].size, m_pRigidBodySystem[6].mass);
-	m_pRigidBodySystem[7].init(Vec3(-0.15f, -0.2f, 0), m_pRigidBodySystem[7].size, m_pRigidBodySystem[7].mass);
+	m_pRigidBodySystem[4].init(Vec3(-0.25f, -0.4f, 0), m_pRigidBodySystem[4].size, m_pRigidBodySystem[4].mass, CUBE);
+	m_pRigidBodySystem[5].init(Vec3(0.25f, -0.4f, 0), m_pRigidBodySystem[5].size, m_pRigidBodySystem[5].mass, CUBE);
+	m_pRigidBodySystem[6].init(Vec3(0.1f, -0.2f, 0), m_pRigidBodySystem[6].size, m_pRigidBodySystem[6].mass, CUBE);
+	m_pRigidBodySystem[7].init(Vec3(-0.15f, -0.2f, 0), m_pRigidBodySystem[7].size, m_pRigidBodySystem[7].mass, CUBE);
 }

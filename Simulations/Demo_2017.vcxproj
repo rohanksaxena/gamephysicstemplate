@@ -224,6 +224,8 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CoupledCollision.cpp" />
+    <ClCompile Include="CoupledSimulation.cpp" />
     <ClCompile Include="MassSpringSystemSimulator.cpp" />
     <ClCompile Include="DiffusionSimulator.cpp" />
     <ClCompile Include="main.cpp" />
@@ -235,6 +237,8 @@
     <ClCompile Include="util\util.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CoupledCollision.h" />
+    <ClInclude Include="CoupledSimulation.h" />
     <ClInclude Include="DiffusionSimulator.h" />
     <ClInclude Include="collisionDetect.h" />
     <ClInclude Include="DrawingUtilitiesClass.h" />

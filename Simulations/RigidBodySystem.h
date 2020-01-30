@@ -3,12 +3,15 @@
 #define RIGIDBODYSYSTEM_h
 #include "Simulator.h"
 
+#define CUBE 0
+#define SPHERE 1
+
 class RigidBodySystem {
 public:
 	// Construtors
 	
 	RigidBodySystem();
-	void init(Vec3 position, Vec3 size, float mass);
+	void init(Vec3 position, Vec3 size, float mass, int type);
 	float mass;
 	Vec3 comPosition;
 	Vec3 comVelocity;
@@ -20,6 +23,7 @@ public:
 	Mat4 objToWorldMat;
 	Vec3 forces;
 	Vec3 torque;
+	int type;
 	//functions
 	void precalculateIntertiaInverse();
 	Vec3 worldToObj(Vec3 position);

@@ -13,11 +13,9 @@ Grid::Grid(int n, int m) {
 	for (int i = 0; i < n; ++i)
 		grid[i] = new float[m];
 
-	std::mt19937 eng;
-	std::uniform_real_distribution<float> randCol(-1.0f, 1.0f);
 	for (int j = 0; j < m; j++) {
 		for (int i = 0; i < n; i++) {
-			grid[i][j] = randCol(eng);
+			grid[i][j] = 0;
 		}
 	}
 	for (int i = 0; i < n; i++) {
